@@ -1,0 +1,22 @@
+{
+  "name": "calculate.jquery",
+  "version": "0.0.0",
+  "description": "Do math with form fields, and put results in other fields",
+  "main": "src/calculate.jquery.js",
+  "keywords": [
+    "form",
+    "math",
+    "calculation"
+  ],
+  "authors": [
+    "Pablo Brasero"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
