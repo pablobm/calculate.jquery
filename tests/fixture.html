@@ -1,0 +1,67 @@
+<!DOCTYPE>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fixtures</title>
+  <style>
+  body {
+    background: white;
+  }
+  p {
+    margin-bottom: .5em;
+  }
+  .total-wrap {
+    border-top: 1px solid black;
+  }
+  </style>
+</head>
+<body>
+
+<div class="one-to-one">
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+
+<div class="one-to-many">
+  <p><input class="operand" value="14"></p>
+  <p><input class="operand" value="1"></p>
+  <p><input class="operand" value="0.8"></p>
+  <p><input class="product" value="4"></p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+
+<div class="many-to-many">
+  <div class="one">
+    <p><input class="base" value="12.3"> Base</p>
+    <p><input class="diff" value="5.4"> Difference</p>
+    <p class="total-wrap"><input class="total"> Total</p>
+  </div>
+  <div class="one">
+    <p><input class="base" value="4"> Base</p>
+    <p><input class="diff" value="9"> Difference</p>
+    <p class="total-wrap"><input class="total"> Total</p>
+  </div>
+</div>
+
+<div class="custom-input">
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+
+<div class="custom-output">
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+
+<div class="variable">
+  <p><input class="toggle" type="checkbox"> Difference?</p>
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+
+</body>
+</html>
