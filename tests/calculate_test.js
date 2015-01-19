@@ -12,15 +12,15 @@ describe("Calculate", function () {
 
   describe("jQuery plugin interface", function () {
     it("is chainable", function () {
-      dom.find('.one-to-one')
+      dom.find('.basics')
         .calculate('{{.total}} = {{.base}} - {{.diff}}')
         .css('background-color', 'red');
     });
   });
 
-  describe("One to one", function () {
+  describe("Basics", function () {
     beforeEach(function () {
-      base = dom.find('.one-to-one');
+      base = dom.find('.basics');
       base.calculate('{{.total}} = {{.base}} - {{.diff}}');
     });
 
