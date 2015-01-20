@@ -72,18 +72,18 @@ describe("Calculate", function () {
 
   describe("Custom input parser", function () {
     beforeEach(function () {
-      var inputParser = function (rawVal) {
-        return rawVal.replace(/,/g, '');
+      var esInputParser = function (rawVal) {
+        var pair = rawVal.split(',');
+        var integer = pair[0].replace(/\./g, '');
+        var decimal = pair[1] || '0';
+        return (integer + '.' + decimal)*1;
       };
       base = dom.find('.custom-input');
-      base.calculate('{{.total}} = {{.base}} - {{.diff}}', { inputParser: inputParser });
+      base.calculate('{{.total}} = {{.base}} - {{.diff}}', { inputParser: esInputParser });
     });
 
-    it("allows interpreting funny numbers (like '1,234,567.11')" , function () {
-      base.find('.base')
-        .val('1,234,567.11')
-        .trigger('change');
-      expect(base.find('.total').val()).to.eql('1234562.01');
+    it("allows interpreting numbers in arbitrary formats" , function () {
+      expect(base.find('.total').val()).to.eql('1234562');
     });
   });
 
