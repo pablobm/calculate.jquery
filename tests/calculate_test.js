@@ -21,6 +21,7 @@ describe("Calculate", function () {
   describe("Basics", function () {
     beforeEach(function () {
       base = dom.find('.basics');
+      base.find('.diff').val(5.1);
       base.calculate('{{.total}} = {{.base}} - {{.diff}}');
     });
 
@@ -104,32 +105,26 @@ describe("Calculate", function () {
     });
   });
 
-  describe("Variable formulas", function () {
-    var eventEmitter;
+  describe("API", function () {
+    var api;
 
     beforeEach(function () {
-      eventEmitter = $(document);
-
-      base = dom.find('.variable');
-      var calc = base.calculate(function () {
-        if ($(this).find('.toggle').prop('checked')) {
-          return '{{.total}} = {{.base}} - {{.diff}}';
-        }
-        else {
-          return '{{.total}} = {{.base}}';
-        }
-      });
-      eventEmitter.on('doStuff', function () {
-        calc.run();
+      base = dom.find('.api-formula');
+      base.calculate(function(_api) {
+        api = _api;
       });
     });
 
-    it("updates with correct formula on change", function () {
+    it("can change the formula", function() {
+      api.formula('{{.total}} = {{.base}}');
       expect(base.find('.total').val()).to.eql('12.2');
 
-      base.find('.toggle').prop('checked', true);
-      eventEmitter.trigger('doStuff');
+      api.formula('{{.total}} = {{.base}} - {{.diff}}');
       expect(base.find('.total').val()).to.eql('7.1');
     });
+
+    it("can trigger an update");
+    it("cleans up unused event handlers");
   });
+
 });

@@ -128,3 +128,50 @@ $('.custom-output').calculate('{{.total}} = {{.base}} - {{.diff}}', { outputForm
 ```
 
 As a result, the value of `.total` will be formatted with two decimals, rounding when appropriate.
+
+## API
+
+Instances of the calculator offer an API. This can be used to cover more advanced cases. To use the API, call `calculate()` with a function. This function will receive the api as first and only parameter:
+
+```js
+$('.example').calculate(function(api) {
+  // Do stuff with `api` here
+});
+```
+
+The interface is:
+
+  * `formula(newFormula)`: receives a string with a formula. This will replace the current formula for the calculator
+
+### `formula(newFormula)`
+
+Sometimes, the formula to apply will not be static, and will depend on external factors. For example, the formula may change following a change on a checkbox. See this example:
+
+```html
+<div class="api-formula">
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+```
+
+With this JS:
+
+```js
+var api;
+$('.api-formula').calculate(function(_api) {
+  api = _api;
+});
+api.formula('{{.total}} = {{.base}}');
+
+// At this point, the value of `.total` will be 12.2
+
+api.formula('{{.total}} = {{.base}} - {{.diff}}');
+
+// Here, the value of `.total` will be 7.1
+```
+
+
+
+
+
