@@ -144,7 +144,20 @@ describe("Calculate", function () {
       });
     });
 
-    it("cleans up unused event handlers");
+    describe("clean up unused event handlers", function() {
+      beforeEach(function () {
+        setBase('.api-cleanup');
+      });
+
+      it("does that indeed", function() {
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+        api.formula('{{.total}} = {{.base}}');
+        var total = base.find('.total');
+        total.val('blah');
+        base.find('.diff').trigger('change');
+        expect(total.val()).to.eql('blah');
+      });
+    });
   });
 
 });
