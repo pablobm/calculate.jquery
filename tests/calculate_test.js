@@ -108,22 +108,42 @@ describe("Calculate", function () {
   describe("API", function () {
     var api;
 
-    beforeEach(function () {
-      base = dom.find('.api-formula');
+    function setBase(selector) {
+      base = dom.find(selector);
       base.calculate(function(_api) {
         api = _api;
       });
+    }
+
+    describe("formula()", function() {
+      beforeEach(function () {
+        setBase('.api-formula');
+      });
+
+      it("can change the formula", function() {
+        api.formula('{{.total}} = {{.base}}');
+        expect(base.find('.total').val()).to.eql('12.2');
+
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+        expect(base.find('.total').val()).to.eql('7.1');
+      });
     });
 
-    it("can change the formula", function() {
-      api.formula('{{.total}} = {{.base}}');
-      expect(base.find('.total').val()).to.eql('12.2');
+    describe("run()", function() {
+      beforeEach(function () {
+        setBase('.api-run');
+        base.find('.diff').val('5.1');
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+      });
 
-      api.formula('{{.total}} = {{.base}} - {{.diff}}');
-      expect(base.find('.total').val()).to.eql('7.1');
+      it("can trigger an update", function() {
+        base.find('.diff').val('0.1');
+        expect(base.find('.total').val()).to.eql('7.1');
+        api.run();
+        expect(base.find('.total').val()).to.eql('12.1');
+      });
     });
 
-    it("can trigger an update");
     it("cleans up unused event handlers");
   });
 

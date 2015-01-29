@@ -142,8 +142,9 @@ $('.example').calculate(function(api) {
 The interface is:
 
   * `formula(newFormula)`: receives a string with a formula. This will replace the current formula for the calculator
+  * `run()`: forces a recalculation
 
-### `formula(newFormula)`
+### Example of `formula(newFormula)`
 
 Sometimes, the formula to apply will not be static, and will depend on external factors. For example, the formula may change following a change on a checkbox. See this example:
 
@@ -170,8 +171,3 @@ api.formula('{{.total}} = {{.base}} - {{.diff}}');
 
 // Here, the value of `.total` will be 7.1
 ```
-
-
-
-
-
