@@ -48,14 +48,23 @@
     setEvents: function() {
       var that = this;
       Object.keys(this.details.operands).forEach(function(selector) {
-        var evt = {
-          query: that.base.find(selector),
-          name: 'change',
-          handler: function() { that.run(); }
-        }
-        evt.query.on(evt.name, evt.handler);
-        that.events.push(evt);
+        that.setEvent(
+          that.base.find(selector),
+          'change',
+          function() { that.run() }
+        );
       });
+    },
+
+    setEvent: function(query, name, handler) {
+      var that = this;
+      var evt = {
+        query: query,
+        name: name,
+        handler: handler
+      }
+      evt.query.on(evt.name, evt.handler);
+      this.events.push(evt);
     },
 
     run: function() {
