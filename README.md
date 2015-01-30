@@ -80,7 +80,7 @@ Each individual `.total` will be calculated within the context of each `.many-to
 
 ## Custom input parser
 
-You may want to preprocess the input fields before they are used. To do this, provide the option `outputFormatter`.
+You may want to preprocess the input fields before they are used. To do this, provide the option `inputParser`.
 
 For example, the number 1234567.89 can be written as "1,234,567.89" or "1.234.567,89" depending on the locale. This HTML uses Spanish formatting:
 
@@ -101,7 +101,7 @@ var esInputParser = function (rawVal) {
   var decimal = pair[1] || '0';
   return (integer + '.' + decimal)*1;
 };
-$('.custom-output').calculate('{{.total}} = {{.base}} - {{.diff}}', { outputFormatter: esInputParser });
+$('.custom-input').calculate('{{.total}} = {{.base}} - {{.diff}}', { inputParser: esInputParser });
 ```
 
 ## Custom output formatter
