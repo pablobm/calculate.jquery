@@ -18,6 +18,7 @@
     this.base = $(base);
     this.details = null;
     this.opts = opts || {};
+    this.events = [];
   }
   Api.prototype = {
     formula: function(val) {
@@ -33,11 +34,27 @@
     },
 
     updateEvents: function() {
+      this.removeEvents();
+      this.setEvents();
+    },
+
+    removeEvents: function() {
+      this.events.forEach(function(evt) {
+        evt.query.off(evt.name, evt.handler);
+      });
+      this.events = [];
+    },
+
+    setEvents: function() {
       var that = this;
       Object.keys(this.details.operands).forEach(function(selector) {
-        that.base.find(selector).on('change', function() {
-          that.run();
-        });
+        var evt = {
+          query: that.base.find(selector),
+          name: 'change',
+          handler: function() { that.run(); }
+        }
+        evt.query.on(evt.name, evt.handler);
+        that.events.push(evt);
       });
     },
 
