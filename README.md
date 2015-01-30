@@ -181,3 +181,5 @@ api.formula('{{.total}} = {{.base}}');
 api.formula('{{.total}} = {{.base}} - {{.diff}}');
 // Now, `.total` will have a value of '7.1'
 ```
+
+The plugin knows to remove unused event handlers when appropriate, avoiding memory leaks. Or so I hope!
