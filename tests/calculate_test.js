@@ -3,9 +3,28 @@ describe("Calculate", function () {
   var expect = chai.expect;
 
   var dom;
-  beforeEach(function() {
+  before(function() {
     var iframe = $('#fixture');
     dom = iframe.contents();
+  });
+
+  // Browsers tend to keep field values after a reload. This is great
+  // when browsing, but a pain when testing!
+  // This ensures the fields are reset to their original values after
+  // a reload.
+  var inputs = [];
+  before(function() {
+    dom.find(':input').each(function() {
+      inputs.push({
+        element: this,
+        value: $(this).val()
+      });
+    });
+  });
+  beforeEach(function() {
+    inputs.forEach(function(o) {
+      $(o.element).val(o.value);
+    });
   });
 
   var base = null;
@@ -21,7 +40,6 @@ describe("Calculate", function () {
   describe("Basics", function () {
     beforeEach(function () {
       base = dom.find('.basics');
-      base.find('.diff').val(5.1);
       base.calculate('{{.total}} = {{.base}} - {{.diff}}');
     });
 
@@ -155,7 +173,6 @@ describe("Calculate", function () {
     describe("run()", function() {
       beforeEach(function () {
         setBase('.api-run');
-        base.find('.diff').val('5.1');
         api.formula('{{.total}} = {{.base}} - {{.diff}}');
       });
 
