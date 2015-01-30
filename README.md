@@ -129,6 +129,17 @@ $('.custom-output').calculate('{{.total}} = {{.base}} - {{.diff}}', { outputForm
 
 As a result, the value of `.total` will be formatted with two decimals, rounding when appropriate.
 
+## Default options
+
+It's possible to set default values for options (at the moment these are only `inputParser` and `outputFormatter`). To do so, use `$.calculate.options(defaults)`, like so:
+
+    $.calculate.options({
+      inputParser: function() { ... },
+      outputFormatter: function() { ... }
+    });
+
+Any subsequent invocations of the plugin will use those options.
+
 ## API
 
 Instances of the calculator offer an API. This can be used to cover more advanced cases. To use the API, call `calculate()` with a function. This function will receive the api as first and only parameter:
