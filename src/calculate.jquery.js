@@ -66,14 +66,17 @@
     run: function() {
       var that = this;
       this.base.each(function() {
-        var singleBase = $(this);
-        var values = readValues(that.details.operands, singleBase, that.opts.inputParser);
-        var result = that.compiled.eval(values);
-        var formattedResult = that.opts.outputFormatter(result);
-        singleBase.find(that.details.resultSelector)
-          .val(formattedResult)
-          .trigger('change');
+        that.runOne($(this));
       });
+    },
+
+    runOne: function(base) {
+      var values = readValues(this.details.operands, base, this.opts.inputParser);
+      var result = this.compiled.eval(values);
+      var formattedResult = this.opts.outputFormatter(result);
+      base.find(this.details.resultSelector)
+        .val(formattedResult)
+        .trigger('change');
     }
   }
 
@@ -102,14 +105,17 @@
     },
 
     setEvents: function(self) {
-      var that = self;
       Object.keys(self.details.operands).forEach(function(selector) {
-        priv.setEvent(
-          self,
-          that.base.find(selector),
-          'change',
-          function() { that.run() }
-        );
+        self.base.each(function() {
+          var singleBase = $(this);
+          var field = singleBase.find(selector);
+          priv.setEvent(
+            self,
+            field,
+            'change',
+            function() { self.runOne(singleBase) }
+          );
+        });
       });
     },
 

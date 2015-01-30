@@ -69,6 +69,17 @@ describe("Calculate", function () {
       expect(totals.eq(0).val()).to.eql('6.9');
       expect(totals.eq(1).val()).to.eql('-5');
     });
+
+    it("only updates those that emit a 'change' event", function() {
+      var total1 = base.eq(0).find('.total');
+      var total2 = base.eq(1).find('.total');
+      var diff2  = base.eq(1).find('.diff');
+      total1.val('stuff');
+      diff2.val('10');
+      diff2.trigger('change');
+      expect(total1.val()).to.eql('stuff');
+      expect(total2.val()).to.eql('-6');
+    });
   });
 
   describe("Custom input parser", function () {
