@@ -120,7 +120,6 @@
     },
 
     setEvent: function(self, query, name, handler) {
-      var that = self;
       var evt = {
         query: query,
         name: name,
