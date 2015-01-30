@@ -1,5 +1,9 @@
 (function ($) {
 
+  //
+  // jQuery hook
+  //
+
   $.fn.calculate = function (stringOrFunction, opts) {
     var opts = $.extend({}, $.calculate.defaults(), opts || {});
     var api = new Api(this, opts);
@@ -14,72 +18,10 @@
     return this;
   }
 
-  function Api(base, opts) {
-    this.base = $(base);
-    this.details = null;
-    this.opts = opts || {};
-    this.events = [];
-  }
-  Api.prototype = {
-    formula: function(val) {
-      this.compile(val);
-      this.updateEvents();
-      this.run();
-    },
 
-    compile: function(formula) {
-      this.details = parseFormula(formula);
-      var tree = math.parse(this.details.rside);
-      this.compiled = tree.compile(math);
-    },
-
-    updateEvents: function() {
-      this.removeEvents();
-      this.setEvents();
-    },
-
-    removeEvents: function() {
-      this.events.forEach(function(evt) {
-        evt.query.off(evt.name, evt.handler);
-      });
-      this.events = [];
-    },
-
-    setEvents: function() {
-      var that = this;
-      Object.keys(this.details.operands).forEach(function(selector) {
-        that.setEvent(
-          that.base.find(selector),
-          'change',
-          function() { that.run() }
-        );
-      });
-    },
-
-    setEvent: function(query, name, handler) {
-      var that = this;
-      var evt = {
-        query: query,
-        name: name,
-        handler: handler
-      }
-      evt.query.on(evt.name, evt.handler);
-      this.events.push(evt);
-    },
-
-    run: function() {
-      var that = this;
-      this.base.each(function() {
-        var singleBase = $(this);
-        var values = readValues(that.details.operands, singleBase, that.opts.inputParser);
-        var result = that.compiled.eval(values);
-        var formattedResult = that.opts.outputFormatter(result);
-        singleBase.find(that.details.resultSelector)
-          .val(formattedResult)
-          .trigger('change');
-      });
-    }
-  }
+  //
+  // Global settings
+  //
 
   $.calculate = {
     inputParser: function(rawVal) { return rawVal },
@@ -102,6 +44,91 @@
       }
     }
   }
+
+
+  //
+  // API
+  //
+
+  function Api(base, opts) {
+    this.base = $(base);
+    this.details = null;
+    this.opts = opts || {};
+    this.events = [];
+  }
+  Api.prototype = {
+    formula: function(val) {
+      priv.compile(this, val);
+      priv.updateEvents(this);
+      this.run();
+    },
+
+    run: function() {
+      var that = this;
+      this.base.each(function() {
+        var singleBase = $(this);
+        var values = readValues(that.details.operands, singleBase, that.opts.inputParser);
+        var result = that.compiled.eval(values);
+        var formattedResult = that.opts.outputFormatter(result);
+        singleBase.find(that.details.resultSelector)
+          .val(formattedResult)
+          .trigger('change');
+      });
+    }
+  }
+
+
+  //
+  // Private "methods"
+  //
+
+  var priv = {
+    compile: function(self, formula) {
+      self.details = parseFormula(formula);
+      var tree = math.parse(self.details.rside);
+      self.compiled = tree.compile(math);
+    },
+
+    updateEvents: function(self) {
+      priv.removeEvents(self);
+      priv.setEvents(self);
+    },
+
+    removeEvents: function(self) {
+      self.events.forEach(function(evt) {
+        evt.query.off(evt.name, evt.handler);
+      });
+      self.events = [];
+    },
+
+    setEvents: function(self) {
+      var that = self;
+      Object.keys(self.details.operands).forEach(function(selector) {
+        priv.setEvent(
+          self,
+          that.base.find(selector),
+          'change',
+          function() { that.run() }
+        );
+      });
+    },
+
+    setEvent: function(self, query, name, handler) {
+      var that = self;
+      var evt = {
+        query: query,
+        name: name,
+        handler: handler
+      }
+      evt.query.on(evt.name, evt.handler);
+      self.events.push(evt);
+    }
+  };
+
+
+  //
+  // Utility functions
+  //
 
   // Receives a string such as '{{.foo}} = {{.bar}} - {{.baz}}'.
   // Returns an object such as:
