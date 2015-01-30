@@ -107,13 +107,25 @@ describe("Calculate", function () {
 
   describe("API", function () {
     var api;
+    var funcThis;
 
     function setBase(selector) {
       base = dom.find(selector);
       base.calculate(function(_api) {
+        funcThis = this;
         api = _api;
       });
     }
+
+    describe("binding", function() {
+      beforeEach(function () {
+        setBase('.api-binding');
+      });
+
+      it("is on the jQuery object", function() {
+        expect(funcThis).to.eql(base);
+      });
+    });
 
     describe("formula()", function() {
       beforeEach(function () {

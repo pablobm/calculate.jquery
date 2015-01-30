@@ -12,7 +12,7 @@
       api.formula(stringOrFunction);
     }
     else {
-      stringOrFunction.call(stringOrFunction, api);
+      stringOrFunction.bind(this).call(stringOrFunction, api);
     }
 
     return this;

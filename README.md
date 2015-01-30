@@ -155,6 +155,8 @@ The interface is:
   * `formula(newFormula)`: receives a string with a formula. This will replace the current formula for the calculator
   * `run()`: forces a recalculation
 
+Additionally, within the function, `this` will be the jQuery object on which `calculate()` was called.
+
 ### API usage example
 
 Sometimes, the formula to apply will not be static, and will depend on external factors. For example, the formula may change following a change on a checkbox. See this example:
