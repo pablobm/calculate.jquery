@@ -80,7 +80,7 @@ Each individual `.total` will be calculated within the context of each `.many-to
 
 ## Custom input parser
 
-You may want to preprocess the input fields before they are used. To do this, provide the option `outputFormatter`.
+You may want to preprocess the input fields before they are used. To do this, provide the option `inputParser`.
 
 For example, the number 1234567.89 can be written as "1,234,567.89" or "1.234.567,89" depending on the locale. This HTML uses Spanish formatting:
 
@@ -101,7 +101,7 @@ var esInputParser = function (rawVal) {
   var decimal = pair[1] || '0';
   return (integer + '.' + decimal)*1;
 };
-$('.custom-output').calculate('{{.total}} = {{.base}} - {{.diff}}', { outputFormatter: esInputParser });
+$('.custom-input').calculate('{{.total}} = {{.base}} - {{.diff}}', { inputParser: esInputParser });
 ```
 
 ## Custom output formatter
@@ -128,3 +128,60 @@ $('.custom-output').calculate('{{.total}} = {{.base}} - {{.diff}}', { outputForm
 ```
 
 As a result, the value of `.total` will be formatted with two decimals, rounding when appropriate.
+
+## Default options
+
+It's possible to set default values for options (at the moment these are only `inputParser` and `outputFormatter`). To do so, use `$.calculate.options(defaults)`, like so:
+
+    $.calculate.options({
+      inputParser: function() { ... },
+      outputFormatter: function() { ... }
+    });
+
+Any subsequent invocations of the plugin will use those options.
+
+## API
+
+Instances of the calculator offer an API. This can be used to cover more advanced cases. To use the API, call `calculate()` with a function. This function will receive the api as first and only parameter:
+
+```js
+$('.example').calculate(function(api) {
+  // Do stuff with `api` here
+});
+```
+
+The interface is:
+
+  * `formula(newFormula)`: receives a string with a formula. This will replace the current formula for the calculator
+  * `run()`: forces a recalculation
+
+Additionally, within the function, `this` will be the jQuery object on which `calculate()` was called.
+
+### API usage example
+
+Sometimes, the formula to apply will not be static, and will depend on external factors. For example, the formula may change following a change on a checkbox. See this example:
+
+```html
+<div class="api-formula">
+  <p><input class="base" value="12.2"> Base</p>
+  <p><input class="diff" value="5.1"> Difference</p>
+  <p class="total-wrap"><input class="total"> Total</p>
+</div>
+```
+
+With this JS:
+
+```js
+var api;
+$('.api-formula').calculate(function(_api) {
+  api = _api;
+});
+
+api.formula('{{.total}} = {{.base}}');
+// At this point, the value of `.total` will be '12.2'
+
+api.formula('{{.total}} = {{.base}} - {{.diff}}');
+// Now, `.total` will have a value of '7.1'
+```
+
+The plugin knows to remove unused event handlers when appropriate, avoiding memory leaks. Or so I hope!

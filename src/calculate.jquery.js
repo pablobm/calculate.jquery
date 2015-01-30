@@ -1,48 +1,27 @@
 (function ($) {
+
+  //
+  // jQuery hook
+  //
+
   $.fn.calculate = function (stringOrFunction, opts) {
-    var opts = opts || {};
-    var autoEvents = typeof stringOrFunction === 'string';
-    var config = {};
-    config.formulaFunction = formularise(stringOrFunction);
-    config.inputParser = opts.inputParser || $.calculate.inputParser;
-    config.outputFormatter = opts.outputFormatter || $.calculate.outputFormatter;
-    config.bases = this.map(function(){ return $(this); });
+    var opts = $.extend({}, $.calculate.defaults(), opts || {});
+    var api = new Api(this, opts);
 
-    var runOne = function (base) {
-      var formula = parseFormula(config.formulaFunction.bind(base[0])());
-      var tree = math.parse(formula.rside);
-      var compiled = tree.compile(math);
-      var values = readValues(formula.operands, base, config.inputParser);
-      var result = compiled.eval(values);
-      var formattedResult = config.outputFormatter(result);
-      base.find(formula.resultSelector)
-        .val(formattedResult)
-        .trigger('change');
+    if (typeof stringOrFunction === 'string') {
+      api.formula(stringOrFunction);
     }
-
-    this.run = function() {
-      $.each(config.bases, function() {
-        runOne(this);
-      });
+    else {
+      stringOrFunction.bind(this).call(stringOrFunction, api);
     }
-
-    if (autoEvents) {
-      var formula = parseFormula(stringOrFunction);
-      config.bases.each(function() {
-        var base = this;
-        var operandSelectors = Object.keys(formula.operands);
-        operandSelectors.forEach(function(selector) {
-          if (selector != formula.resultSelector) {
-            base.find(selector).on('change', function(){ return runOne(base); });
-          }
-        });
-      });
-    }
-
-    this.run();
 
     return this;
-  };
+  }
+
+
+  //
+  // Global settings
+  //
 
   $.calculate = {
     inputParser: function(rawVal) { return rawVal },
@@ -56,49 +35,141 @@
       if (opts.outputFormatter) {
         this.outputFormatter = opts.outputFormatter;
       }
+    },
+
+    defaults: function() {
+      return {
+        inputParser: this.inputParser,
+        outputFormatter: this.outputFormatter
+      }
     }
   }
 
-  function formularise(stringOrFunction) {
-    if (typeof stringOrFunction === 'string') {
-      return function() {
-        return stringOrFunction;
-      }
-    } else {
-      return stringOrFunction;
+
+  //
+  // API
+  //
+
+  function Api(base, opts) {
+    this.base = $(base);
+    this.details = null;
+    this.opts = opts || {};
+    this.events = [];
+  }
+  Api.prototype = {
+    formula: function(val) {
+      priv.compile(this, val);
+      priv.updateEvents(this);
+      this.run();
+    },
+
+    run: function() {
+      var that = this;
+      this.base.each(function() {
+        that.runOne($(this));
+      });
+    },
+
+    runOne: function(base) {
+      var values = readValues(this.details.operands, base, this.opts.inputParser);
+      var result = this.compiled.eval(values);
+      var formattedResult = this.opts.outputFormatter(result);
+      base.find(this.details.resultSelector)
+        .val(formattedResult)
+        .trigger('change');
     }
   }
+
+
+  //
+  // Private "methods"
+  //
+
+  var priv = {
+    compile: function(self, formula) {
+      self.details = parseFormula(formula);
+      var tree = math.parse(self.details.rside);
+      self.compiled = tree.compile(math);
+    },
+
+    updateEvents: function(self) {
+      priv.removeEvents(self);
+      priv.setEvents(self);
+    },
+
+    removeEvents: function(self) {
+      self.events.forEach(function(evt) {
+        evt.query.off(evt.name, evt.handler);
+      });
+      self.events = [];
+    },
+
+    setEvents: function(self) {
+      Object.keys(self.details.operands).forEach(function(selector) {
+        self.base.each(function() {
+          var singleBase = $(this);
+          var field = singleBase.find(selector);
+          priv.setEvent(
+            self,
+            field,
+            'change',
+            function() { self.runOne(singleBase) }
+          );
+        });
+      });
+    },
+
+    setEvent: function(self, query, name, handler) {
+      var evt = {
+        query: query,
+        name: name,
+        handler: handler
+      }
+      evt.query.on(evt.name, evt.handler);
+      self.events.push(evt);
+    }
+  };
+
+
+  //
+  // Utility functions
+  //
 
   // Receives a string such as '{{.foo}} = {{.bar}} - {{.baz}}'.
   // Returns an object such as:
-  //   formula.operands => { '.foo': 'A', '.bar': 'B', '.baz': 'C' }
+  //   formula.operands => { '.bar': 'B', '.baz': 'C' }
   //   formula.resultSelector => '.foo'
   //   formula.rside => 'B - C'
   function parseFormula(str) {
     var formula = {
       operands: {},
     };
-    var invOperands = {};
 
-    var skeleton = str.replace(/\{\{([^\}]+)\}\}/g, function (_match, capture) {
-      var existing = formula.operands[capture];
-      if (existing) {
-        return existing;
-      }
-
-      var newVarName = generateVarName();
-      formula.operands[capture] = newVarName;
-      invOperands[newVarName] = capture;
-      return newVarName;
-    });
-
-    var sides = skeleton.match(/^\s*([^=\s]+)\s*=(.*)$/);
-    var lside = sides[1];
-    formula.rside = sides[2];
-    formula.resultSelector = invOperands[lside];
+    var sides = str.match(/^\s*([^=\s]+)\s*=\s*(.*)$/);
+    formula.rside = assignVariablesToSelectors(sides[2], formula.operands);
+    formula.resultSelector = readFirstSelector(sides[1]);
 
     return formula;
   }
+
+  var formulaSelectorsRegexp = '\{\{([^\}]+)\}\}';
+
+  function assignVariablesToSelectors(formula, dict) {
+    var re = new RegExp(formulaSelectorsRegexp, 'g');
+    return formula.replace(re, function (_, capture) {
+      var existing = dict[capture];
+      if (existing) {
+        return existing;
+      }
+      return dict[capture] = generateVarName();
+    });
+  }
+
+  function readFirstSelector(formula) {
+    var re = new RegExp(formulaSelectorsRegexp);
+    return re.exec(formula)[1];
+  }
+
 
   // Simply returning letters in order for now
   var generateVarName_count = 0;

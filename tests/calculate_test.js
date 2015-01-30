@@ -21,6 +21,7 @@ describe("Calculate", function () {
   describe("Basics", function () {
     beforeEach(function () {
       base = dom.find('.basics');
+      base.find('.diff').val(5.1);
       base.calculate('{{.total}} = {{.base}} - {{.diff}}');
     });
 
@@ -68,6 +69,17 @@ describe("Calculate", function () {
       expect(totals.eq(0).val()).to.eql('6.9');
       expect(totals.eq(1).val()).to.eql('-5');
     });
+
+    it("only updates those that emit a 'change' event", function() {
+      var total1 = base.eq(0).find('.total');
+      var total2 = base.eq(1).find('.total');
+      var diff2  = base.eq(1).find('.diff');
+      total1.val('stuff');
+      diff2.val('10');
+      diff2.trigger('change');
+      expect(total1.val()).to.eql('stuff');
+      expect(total2.val()).to.eql('-6');
+    });
   });
 
   describe("Custom input parser", function () {
@@ -104,32 +116,71 @@ describe("Calculate", function () {
     });
   });
 
-  describe("Variable formulas", function () {
-    var eventEmitter;
+  describe("API", function () {
+    var api;
+    var funcThis;
 
-    beforeEach(function () {
-      eventEmitter = $(document);
-
-      base = dom.find('.variable');
-      var calc = base.calculate(function () {
-        if ($(this).find('.toggle').prop('checked')) {
-          return '{{.total}} = {{.base}} - {{.diff}}';
-        }
-        else {
-          return '{{.total}} = {{.base}}';
-        }
+    function setBase(selector) {
+      base = dom.find(selector);
+      base.calculate(function(_api) {
+        funcThis = this;
+        api = _api;
       });
-      eventEmitter.on('doStuff', function () {
-        calc.run();
+    }
+
+    describe("binding", function() {
+      beforeEach(function () {
+        setBase('.api-binding');
+      });
+
+      it("is on the jQuery object", function() {
+        expect(funcThis).to.eql(base);
       });
     });
 
-    it("updates with correct formula on change", function () {
-      expect(base.find('.total').val()).to.eql('12.2');
+    describe("formula()", function() {
+      beforeEach(function () {
+        setBase('.api-formula');
+      });
 
-      base.find('.toggle').prop('checked', true);
-      eventEmitter.trigger('doStuff');
-      expect(base.find('.total').val()).to.eql('7.1');
+      it("can change the formula", function() {
+        api.formula('{{.total}} = {{.base}}');
+        expect(base.find('.total').val()).to.eql('12.2');
+
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+        expect(base.find('.total').val()).to.eql('7.1');
+      });
+    });
+
+    describe("run()", function() {
+      beforeEach(function () {
+        setBase('.api-run');
+        base.find('.diff').val('5.1');
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+      });
+
+      it("can trigger an update", function() {
+        base.find('.diff').val('0.1');
+        expect(base.find('.total').val()).to.eql('7.1');
+        api.run();
+        expect(base.find('.total').val()).to.eql('12.1');
+      });
+    });
+
+    describe("clean up unused event handlers", function() {
+      beforeEach(function () {
+        setBase('.api-cleanup');
+      });
+
+      it("does that indeed", function() {
+        api.formula('{{.total}} = {{.base}} - {{.diff}}');
+        api.formula('{{.total}} = {{.base}}');
+        var total = base.find('.total');
+        total.val('blah');
+        base.find('.diff').trigger('change');
+        expect(total.val()).to.eql('blah');
+      });
     });
   });
+
 });
