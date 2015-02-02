@@ -2,6 +2,16 @@
 
 A jQuery plugin to do math with form fields, and put results in other fields.
 
+## Setup
+
+This library requires [jQuery](http://jquery.com/) (v1.7.0+) and [MathJS](http://mathjs.org/) (v1.2.0). Reference these dependencies in your HTML before this library:
+
+```html
+<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mathjs/1.2.0/math.min.js"></script>
+<script src="calculate.jquery.js"></script>
+```
+
 ## The basics
 
 Take the following HTML:
