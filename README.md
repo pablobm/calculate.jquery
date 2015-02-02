@@ -12,6 +12,8 @@ This library requires [jQuery](http://jquery.com/) (v1.7.0+) and [MathJS](http:/
 <script src="calculate.jquery.js"></script>
 ```
 
+You can grab the `calculate.jquery.js` file from [src/calculate.jquery.js](https://raw.githubusercontent.com/pablobm/calculate.jquery/master/src/calculate.jquery.js).
+
 ## The basics
 
 Take the following HTML:
