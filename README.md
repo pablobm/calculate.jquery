@@ -202,7 +202,11 @@ The plugin knows to remove unused event handlers when appropriate, avoiding memo
 
 Bug reports and contributions are welcome. Please check [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Credits
 
+Big props go to my employer: [New Bamboo](http://new-bamboo.co.uk). This library was extracted from code of one of its projects. Additional work was also done on company time.
 
+Copyright (C) 2015 Pablo Brasero Moreno
 
+Licensed under the MIT License. See [LICENSE.md](./LICENSE.md) for details.
 
