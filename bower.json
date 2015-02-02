@@ -1,6 +1,6 @@
 {
   "name": "calculate.jquery",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Do math with form fields, and put results in other fields",
   "main": "src/calculate.jquery.js",
   "keywords": [
