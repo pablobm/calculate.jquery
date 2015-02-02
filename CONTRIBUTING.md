@@ -22,7 +22,7 @@ To run the tests, you'll need to first run some simple webserver that allows you
     $ python -m SimpleHTTPServer
 
     # With Ruby
-    $ ruby -rwebrick -e'WEBrick::HTTPServer.new(:Port => 3000, :DocumentRoot => Dir.pwd).start' # Ruby
+    $ ruby -rwebrick -e'WEBrick::HTTPServer.new(:Port => 3000, :DocumentRoot => Dir.pwd).start'
 
 Regardless of how you do it, remember to run the server from the **root folder of the project**, as opposed to the tests folder. This is because there are symlinks from the tests to the primary library file.
 
