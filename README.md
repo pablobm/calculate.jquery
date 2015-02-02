@@ -2,6 +2,14 @@
 
 A jQuery plugin to do math with form fields, and put results in other fields.
 
+This code is known to work in the following browsers:
+
+  * Firefox 18
+  * Chrome 40
+  * Internet Explorer 9
+  * Safari 8
+  * Opera 27
+
 ## Setup
 
 This library requires [jQuery](http://jquery.com/) (v1.7.0+) and [MathJS](http://mathjs.org/) (v1.2.0). Reference these dependencies in your HTML before this library:
